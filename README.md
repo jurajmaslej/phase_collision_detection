@@ -20,10 +20,8 @@ Show closest points (features) on both geometries <br>
 ## Our progress so far
 ### https://www.youtube.com/watch?v=lmj4MT5yGOU
 ### Code in progress is on branch 'vpython'
-<p>
 Implemented scene with 2 objects.
 Scene is scalable, user can rotate screen
-<p>
 ### Objects
 User can move objects
 Closest vertices are marked
