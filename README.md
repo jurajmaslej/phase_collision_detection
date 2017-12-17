@@ -20,8 +20,26 @@ Show closest points (features) on both geometries <br>
 ## Our progress so far
 ### https://www.youtube.com/watch?v=lmj4MT5yGOU
 ### Code in progress is on branch 'vpython'
-Implemented scene with 2 objects.
+Implemented scene with 2 objects.  <br>
 Scene is scalable, user can rotate screen
 ### Objects
-User can move objects
+User can move objects <br>
 Closest vertices are marked
+
+### Code-base
+#### Class Obj <br>
+Wrapper class for vpython objects <br>
+Object has vertices and vpython instance of object it represents <br>
+There are two sub-classes, Vertex and Line <br>
+#### Vertex <br>
+ - position on x-axis <br>
+ - position on y-axis <br>
+ - list of neighbouring vertices <br>
+
+### V-clip algorithm
+
+We studied clipping algorithm and Voronoi regions. <br>
+We tried to implement checking nearest vertices only by looking on 
+neighbouring vertices. However we still have issues with updating vertex positions. <br>
+Sources: https://pdfs.semanticscholar.org/8bc2/9a05f06e557fb711df7769e2d1e6535a1516.pdf <br>
+https://dai.fmph.uniba.sk/upload/2/2b/Ca15_lesson07.pdf
