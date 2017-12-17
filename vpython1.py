@@ -32,6 +32,9 @@ class Obj:
 			
 		def __str__(self):
 			return 'x: ' + str(self.x) + ' y: ' + str(self.y)
+		
+		def __repr__(self):
+			return 'x: ' + str(self.x) + ' y: ' + str(self.y)
 			
 		def add_neighbourg(self, neighbour):
 			if type(neighbour) == list:
@@ -77,6 +80,7 @@ class Obj:
 		#print(v2)
 		#print(v3)
 		#print(v4)
+		
 
 	def rectangle_lines(self): ## requires to have vertices counted
                 # lines :
@@ -125,7 +129,7 @@ R2 = box(pos=vector(5,0,0), size=vector(2,5,0), axis=vector(1,0,0), color=color.
 
 R1 = Obj(R1)
 R2 = Obj(R2)
-print(R1)
+
 R1.rectangle_points(R1.obj)
 R2.rectangle_points(R2.obj)
 
@@ -149,38 +153,51 @@ def closest_vertices():
 		for v2 in objects[1].vertices:
 			v_dst = v1.vertex_dst(v2)
 			if v_dst <= closest_dst:
-				print('closest_dst ', closest_dst)
+				#print('closest_dst ', closest_dst)
 				closest_dst = v_dst
 				closest_pair = (v1,v2)
-	print('closest_dst ', closest_dst)
-	print('closest_pair ', closest_pair[0], closest_pair[1])
+	#print('closest_dst ', closest_dst)
+	#print('closest_pair ', closest_pair[0], closest_pair[1])
 	return closest_pair
 
-def new_pair(old_pair):
+def new_pair():
+	global vertex_pair
 	'''
 	should run in move()
 	calculates new closest vertices from neighbours
 	of now closest vertices (ones in old_pair)
 	'''
-	#print('#######################')
+
+	
+	old_pair = vertex_pair
 	closest_pair = old_pair
 	v1 = old_pair[0]
 	v2 = old_pair[1]
+	#print ('vertices')
+	#print (v1)
+	#print (v2)
+	#print('###')
 	closest = v1.vertex_dst(v2)		#closest dst so far
 	for neigh1 in v1.neighbours:
 		for neigh2 in v2.neighbours:
 			dst = neigh1.vertex_dst(neigh2)
+			#print (' closest in new_pair ', dst)
 			if dst < closest:
+				print ('## change1 ##')
 				closest = dst
 				closest_pair = (neigh1,neigh2)
 	for neigh1 in v1.neighbours:
 		dst = neigh1.vertex_dst(v2)
+		#print (' closest in new_pair ', dst)
 		if dst < closest:
+			print ('## change2 ##')
 			closest = dst
 			closest_pair = (neigh1,v2)
 	for neigh2 in v2.neighbours:
-		dst = neigh1.vertex_dst(v1)
+		dst = neigh2.vertex_dst(v1)
+		#print (' closest in new_pair ', dst)
 		if dst < closest:
+			print ('## change3 ##')
 			closest = dst
 			closest_pair = (v1,neigh2)
 	return closest_pair
@@ -190,15 +207,13 @@ def paint_vertex_pair(closest_pts):
                 if len(painted_vertices) <= i:
                         painted_vertices.append(sphere(pos = vector(closest_pts[i].x,closest_pts[i].y,0),radius = 0.1, color = color.red))
                 else:
-                        print(painted_vertices[i].pos)
+                        #print(painted_vertices[i].pos)
                         painted_vertices[i].pos = vector(closest_pts[i].x,closest_pts[i].y,0)
                         painted_vertices[i].color = color.red
 
 vertex_pair = closest_vertices()
-vertex_pair_new = vertex_pair
-print ('new pair ', new_pair(vertex_pair)[0], new_pair(vertex_pair)[1])
+print ('vertex pair at start ', vertex_pair)
 drag_pos = None # No object has been picked yet
-
 
 def grab(evt):
         global drag_pos
@@ -217,7 +232,7 @@ def grab(evt):
                 drag_pos = evt.pos
                 scene.bind('mousemove', moveR2)
                 scene.bind('mouseup', drop)
-a = 1
+
         
 def moveR1(evt):
         global drag_pos
@@ -230,12 +245,15 @@ def moveR1(evt):
                 displace = new_pos - drag_pos
                 R1.obj.pos += displace
                 drag_pos = new_pos # updates drag position
+                
+                update_closest_pts()
 
 def update_closest_pts():
         R1.rectangle_points(R1.obj)
         R1.rectangle_lines()
         R2.rectangle_points(R2.obj)
         closest_pts = closest_vertices()
+        #closest_pts2 = new_pair()
         paint_vertex_pair(closest_pts)
 
         
@@ -250,6 +268,8 @@ def moveR2(evt):
                 displace = new_pos - drag_pos
                 R2.obj.pos += displace
                 drag_pos = new_pos # updates drag
+                
+                update_closest_pts()
         # paint_vertex_pair()
                 
 def drop(evt):
@@ -257,8 +277,7 @@ def drop(evt):
 	scene.unbind('mousemove', moveR2)
 	scene.unbind('mouseup', drop)
 	# do something - label/light closest vertices somehow
-	update_closest_pts()
-	print(vertex_pair[0].x, vertex_pair[0].y)
+	
 	# vertex_pair = close	# error "variable referenced before assingment"
 
 def setup_scene():
