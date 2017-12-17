@@ -35,6 +35,10 @@ There are two sub-classes, Vertex and Line <br>
  - position on x-axis <br>
  - position on y-axis <br>
  - list of neighbouring vertices <br>
+ 
+### Technology
+We used vpython library, it allows us to run GUI on browser <br>
+We plan to use numpy for further math applications 
 
 ### V-clip algorithm
 
