@@ -314,6 +314,13 @@ def grab(evt):
                 drag_pos = evt.pos
                 scene.bind('mousemove', moveR2)
                 scene.bind('mouseup', drop)
+                
+        if scene.mouse.pick == R3.obj: # if mouseclick on R3, object =R3
+                for i in painted_vertices:
+                        i.color = color.black
+                drag_pos = evt.pos
+                scene.bind('mousemove', moveR3)
+                scene.bind('mouseup', drop)
 
         
 def moveR1(evt):
@@ -353,10 +360,26 @@ def moveR2(evt):
                 
                 update_closest_pts()
         # paint_vertex_pair()
+        
+def moveR3(evt):
+        global drag_pos
+        # print('obj ', obj)
+        # project onto xy plane, even if scene rotated:
+        new_pos = evt.pos               # vector added
+        
+        if new_pos != drag_pos: # checks if mouse has moved
+                # offset for where the rectangle was touched:
+                displace = new_pos - drag_pos
+                R3.obj.pos += displace
+                drag_pos = new_pos # updates drag
+                
+                #update_closest_pts()
+        # paint_vertex_pair()
                 
 def drop(evt):
         scene.unbind('mousemove', moveR1)
         scene.unbind('mousemove', moveR2)
+        scene.unbind('mousemove', moveR3)
         scene.unbind('mouseup', drop)
         # do something - label/light closest vertices somehow
         
