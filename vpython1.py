@@ -321,16 +321,19 @@ def create_obj_from_vertices(obj_vertices): # TODO
         for 5 vertices it works, need to make some more conditions for different numbers
         '''
         b_idx = 0
-        e_idx = len(obj_vertices)
+        e_idx = len(obj_vertices) - 1
+        print('e_idx ', e_idx)
         tris = []
         for i in range(0,e_idx):
                 if b_idx+1==e_idx:
                         break
                 if i%2 == 0:
+                        print('b_idx ', b_idx, ' obj vertices ', obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx])
                         tris.append( triangle(vs = [obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx]], my_id = 'obj1'))
                         b_idx+=1
                 else:
                         tris.append( triangle(vs = [obj_vertices[e_idx],obj_vertices[e_idx-1],obj_vertices[e_idx]], my_id = 'obj1'))
+                        print ('lowering e_idx ', e_idx)
                         e_idx-=1
         new_obj = compound(tris)
         return new_obj
