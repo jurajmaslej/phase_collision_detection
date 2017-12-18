@@ -19,6 +19,10 @@ Show closest points (features) on both geometries <br>
 
 ## Our progress so far
 ### https://www.youtube.com/watch?v=lmj4MT5yGOU
+
+### Multi-line object added
+### https://youtu.be/_x1wac8dQdQ
+
 ### Code in progress is on branch 'vpython'
 Implemented scene with 2 objects.  <br>
 Scene is scalable, user can rotate screen
