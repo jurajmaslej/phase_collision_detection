@@ -36,6 +36,15 @@ There are two sub-classes, Vertex and Line <br>
  - position on y-axis <br>
  - list of neighbouring vertices <br>
  
+ #### Objects displayed
+ <p>
+ Rectangles
+ - built in object 'box' object imported from vpython library </p>
+ N-line object
+ - created using 'rectangle' object from vpython lib.
+ <br>
+ Both are wrapped by Obj class
+ 
 ### Technology
 We used vpython library, it allows us to run GUI on browser <br>
 We plan to use numpy for further math applications 
