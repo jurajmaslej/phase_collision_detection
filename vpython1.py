@@ -27,9 +27,10 @@ class Obj:
                         self.visual.pos = p
                 
         class Vertex:
-                def __init__(self, x, y):
+                def __init__(self, x, y, name=None):
                         self.x = x
                         self.y = y
+                        self.name = name
                         self.neighbours = []
                         
                 def __str__(self):
@@ -55,7 +56,7 @@ class Obj:
                 #print('x ',obj.pos.x)
                 #print('y ',obj.pos.y)
                 self.obj = obj
-                self.obj_vertices = obj_vertices
+                self.obj_vertices = obj_vertices		# for n-lines objects
                 self.vertices = []
                 self.lines = []
                 
@@ -85,10 +86,19 @@ class Obj:
                 v3.add_neighbourg([v1, v4])
                 v4.add_neighbourg([v2, v3])
                 
-                #print(v1)
-                #print(v2)
-                #print(v3)
-                #print(v4)
+        def nline_points(self):
+            '''
+            create list of Vertices for nline object (from triangles)
+            every vertex is in self.vertices only once - even if stated multiple times in input file
+            needed for moving object
+            '''
+            names = set()
+            for v in self.obj_vertices:
+                name = (v.pos.x, v.pos.y)
+                if name not in names:
+                    self.vertices.append(self.Vertex(v.pos.x, v.pos.y, name))
+                names.add((v.pos.x, v.pos.y))
+            #print('names ', names)
                 
 
         def rectangle_lines(self): ## requires to have vertices counted
@@ -131,6 +141,57 @@ class Obj:
                                                 closest.append(j)
                 return closest
 
+
+### would move this into second file
+def load_object_vertices(file_name): 
+        file = open(file_name, 'r')
+        obj_vertices = []
+        for line in file:
+                line = line.strip().split(' ')
+                if len(line)>1:
+                        obj_vertices.append(vertex(pos = vec(float(line[0]), float(line[1]),0)))
+        file.close()
+        return obj_vertices
+	
+def create_obj_from_vertices(obj_vertices): # TODO
+        '''
+        goal is to create object from triangles connecting 1stVertex-2ndVertex-LastVertex
+        e.g. lets create 5 vertices obj. we connect:
+        we do 2vertices from one side connected to one from the other side
+        then we switch from the other side - two from end and one vertex from 
+        1st-2nd-5th, 5th-4th-2nd, 2nd-3rd-4th
+        for 5 vertices it works, need to make some more conditions for different numbers
+        '''
+        b_idx = 0
+        e_idx = len(obj_vertices) - 1
+        tris = []
+        for i in range(0,e_idx):
+                if b_idx+1==e_idx:
+                        break
+                if i%2 == 0:
+                        tris.append( triangle(vs = [obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx]], my_id = 'obj1'))
+                        b_idx+=1
+                else:
+                        tris.append( triangle(vs = [obj_vertices[e_idx],obj_vertices[e_idx-1],obj_vertices[e_idx]], my_id = 'obj1'))
+                        e_idx-=1
+        new_obj = compound(tris)
+        return new_obj
+
+def create_obj_from_vertices2(obj_vertices):
+	if len(obj_vertices) % 3 != 0:
+		raise RuntimeError('Wrong number of vertices in input file')
+	tris = []
+	for i in range (2, len(obj_vertices) + 2, 3):
+		tris.append(triangle(vs = [obj_vertices[i-2],obj_vertices[i-1],obj_vertices[i]], my_id = 'obj1'))
+	new_obj = compound(tris)
+	return new_obj
+###
+
+vertices_multiline = load_object_vertices('object1.txt')
+R3 = create_obj_from_vertices2(vertices_multiline)
+R3.color = color.yellow
+
+
 objects = []    # store objects
 painted_vertices = [] # store painted points(verteces)
 R1 = box(pos=vector(-5,0,0), size=vector(5,2,0),axis=vector(1,0,0), color=color.yellow)
@@ -138,6 +199,10 @@ R2 = box(pos=vector(5,0,0), size=vector(2,5,0), axis=vector(1,0,0), color=color.
 
 R1 = Obj(R1,[])
 R2 = Obj(R2,[])
+R3 = Obj(R3,vertices_multiline)
+R3.nline_points()
+print('r3 object vertices ', R3.vertices)
+
 
 R1.rectangle_points(R1.obj)
 R2.rectangle_points(R2.obj)
@@ -299,62 +364,14 @@ def drop(evt):
 
 def setup_scene():
         scene.title = 'Phase Collision Detection'
-        scene.bind('mousedown', grab)
-
-def load_object_vertices(file_name): 
-        file = open(file_name, 'r')
-        obj_vertices = []
-        for line in file:
-                line = line.strip().split(' ')
-                if len(line)>1:
-                        obj_vertices.append(vertex(pos = vec(float(line[0]), float(line[1]),0)))
-        file.close()
-        return obj_vertices
-
-def create_obj_from_vertices(obj_vertices): # TODO
-        '''
-        goal is to create object from triangles connecting 1stVertex-2ndVertex-LastVertex
-        e.g. lets create 5 vertices obj. we connect:
-        we do 2vertices from one side connected to one from the other side
-        then we switch from the other side - two from end and one vertex from 
-        1st-2nd-5th, 5th-4th-2nd, 2nd-3rd-4th
-        for 5 vertices it works, need to make some more conditions for different numbers
-        '''
-        b_idx = 0
-        e_idx = len(obj_vertices) - 1
-        print('e_idx ', e_idx)
-        tris = []
-        for i in range(0,e_idx):
-                if b_idx+1==e_idx:
-                        break
-                if i%2 == 0:
-                        print('b_idx ', b_idx, ' obj vertices ', obj_vertices[b_idx].pos, obj_vertices[b_idx+1].pos ,obj_vertices[e_idx].pos )
-                        tris.append( triangle(vs = [obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx]], my_id = 'obj1'))
-                        b_idx+=1
-                else:
-                        tris.append( triangle(vs = [obj_vertices[e_idx],obj_vertices[e_idx-1],obj_vertices[e_idx]], my_id = 'obj1'))
-                        print ('lowering e_idx ', e_idx)
-                        e_idx-=1
-        new_obj = compound(tris)
-        return new_obj
-
-def create_obj_from_vertices2(obj_vertices):
-	if len(obj_vertices) % 3 != 0:
-		raise RuntimeError('Wrong number of vertices in input file')
-	tris = []
-	for i in range (2, len(obj_vertices) + 2, 3):
-		tris.append(triangle(vs = [obj_vertices[i-2],obj_vertices[i-1],obj_vertices[i]], my_id = 'obj1'))
-	new_obj = compound(tris)
-	return new_obj
-        
+        scene.bind('mousedown', grab)        
         
 print('start')
 
 os.listdir()
 
 setup_scene()
-vertices = load_object_vertices('object1.txt')
-R = create_obj_from_vertices2(vertices)
+
 
 
 
