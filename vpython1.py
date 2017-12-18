@@ -217,14 +217,14 @@ objects.append(R2)
 
 # objects.append(T) we assunme only two objects
 
-def closest_vertices():
+def closest_vertices(obj1, obj2):
         '''
         at first compare all the vertices
         possibly slow for multi-vertice objects
         '''
         closest_dst = 10000000
-        for v1 in objects[0].vertices:
-                for v2 in objects[1].vertices:
+        for v1 in obj1.vertices:
+                for v2 in obj2.vertices:
                         v_dst = v1.vertex_dst(v2)
                         if v_dst <= closest_dst:
                                 #print('closest_dst ', closest_dst)
@@ -285,7 +285,7 @@ def paint_vertex_pair(closest_pts):
                         painted_vertices[i].pos = vector(closest_pts[i].x,closest_pts[i].y,0)
                         painted_vertices[i].color = color.red
 
-vertex_pair = closest_vertices()
+vertex_pair = closest_vertices(R1, R2)
 print ('vertex pair at start ', vertex_pair)
 drag_pos = None # No object has been picked yet
 
@@ -341,8 +341,7 @@ def update_closest_pts():
         R1.rectangle_points(R1.obj)
         R1.rectangle_lines()
         R2.rectangle_points(R2.obj)
-        closest_pts = closest_vertices()
-        #closest_pts2 = new_pair()
+        closest_pts = closest_vertices(R1, R2)
         paint_vertex_pair(closest_pts)
 
         
