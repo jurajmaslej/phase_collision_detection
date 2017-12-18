@@ -328,7 +328,7 @@ def create_obj_from_vertices(obj_vertices): # TODO
                 if b_idx+1==e_idx:
                         break
                 if i%2 == 0:
-                        print('b_idx ', b_idx, ' obj vertices ', obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx])
+                        print('b_idx ', b_idx, ' obj vertices ', obj_vertices[b_idx].pos, obj_vertices[b_idx+1].pos ,obj_vertices[e_idx].pos )
                         tris.append( triangle(vs = [obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx]], my_id = 'obj1'))
                         b_idx+=1
                 else:
@@ -337,6 +337,15 @@ def create_obj_from_vertices(obj_vertices): # TODO
                         e_idx-=1
         new_obj = compound(tris)
         return new_obj
+
+def create_obj_from_vertices2(obj_vertices):
+	if len(obj_vertices) % 3 != 0:
+		raise RuntimeError('Wrong number of vertices in input file')
+	tris = []
+	for i in range (2, len(obj_vertices) + 2, 3):
+		tris.append(triangle(vs = [obj_vertices[i-2],obj_vertices[i-1],obj_vertices[i]], my_id = 'obj1'))
+	new_obj = compound(tris)
+	return new_obj
         
         
 print('start')
@@ -345,7 +354,7 @@ os.listdir()
 
 setup_scene()
 vertices = load_object_vertices('object1.txt')
-R = create_obj_from_vertices(vertices)
+R = create_obj_from_vertices2(vertices)
 
 
 
