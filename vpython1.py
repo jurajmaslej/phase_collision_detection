@@ -5,6 +5,9 @@ print("STARTED")
 obj1_id = 'obj1'
 obj2_id = 'obj2'
 
+text_file_obj1 = 'object1.txt'
+text_file_obj2 = 'Objects\object2.txt'
+
 
 class Obj:
         
@@ -120,6 +123,21 @@ class Obj:
                         self.lines[3].update(self.vertices[2],self.vertices[0])
                                 
                 
+##                if not self.lines:
+##                        for i in range(0,self.vertices):
+##                                if i<len(self.vertices-1):
+##                                        line = self.Line(self.vertices[i].pos,self.vertices[i+1].pos)
+##                                else:
+##                                        line = self.Line(self.vertices[i].pos,self.vertices[0].pos)
+##                                self.lines.append(line)
+##                else:
+##                        for i in range(0, self.vertices):
+##                                if i<len(self.vertices):
+##                                        self.lines[i].update(self.vertices[i].pos,self.vertices[i+1].pos)
+##                                else
+##                                        self.lines[i].update(self.vertices[i].pos,self.vertices[0].pos)
+
+                
         def nearest_vertices(self, obj2):
                 # find couple of nearest vertexes between this obj and obj2
                 # will run in 'move' function
@@ -153,15 +171,7 @@ def load_object_vertices(file_name):
         file.close()
         return obj_vertices
 	
-def create_obj_from_vertices(obj_vertices): # TODO
-        '''
-        goal is to create object from triangles connecting 1stVertex-2ndVertex-LastVertex
-        e.g. lets create 5 vertices obj. we connect:
-        we do 2vertices from one side connected to one from the other side
-        then we switch from the other side - two from end and one vertex from 
-        1st-2nd-5th, 5th-4th-2nd, 2nd-3rd-4th
-        for 5 vertices it works, need to make some more conditions for different numbers
-        '''
+def create_obj_from_vertices(obj_vertices):
         b_idx = 0
         e_idx = len(obj_vertices) - 1
         tris = []
@@ -169,10 +179,10 @@ def create_obj_from_vertices(obj_vertices): # TODO
                 if b_idx+1==e_idx:
                         break
                 if i%2 == 0:
-                        tris.append( triangle(vs = [obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx]], my_id = 'obj1'))
+                        tris.append( triangle(vs = [obj_vertices[b_idx],obj_vertices[b_idx+1],obj_vertices[e_idx]]))
                         b_idx+=1
                 else:
-                        tris.append( triangle(vs = [obj_vertices[e_idx],obj_vertices[e_idx-1],obj_vertices[e_idx]], my_id = 'obj1'))
+                        tris.append( triangle(vs = [obj_vertices[e_idx],obj_vertices[e_idx-1],obj_vertices[b_idx]]))
                         e_idx-=1
         new_obj = compound(tris)
         return new_obj
@@ -187,8 +197,10 @@ def create_obj_from_vertices2(obj_vertices):
 	return new_obj
 ###
 
-vertices_multiline = load_object_vertices('object1.txt')
-R3 = create_obj_from_vertices2(vertices_multiline)
+##vertices_multiline = load_object_vertices('object1.txt')
+##R3 = create_obj_from_vertices2(vertices_multiline)
+vertices_multiline = load_object_vertices(text_file_obj2)
+R3 = create_obj_from_vertices(vertices_multiline)
 R3.color = color.yellow
 
 
@@ -210,12 +222,6 @@ R2.rectangle_points(R2.obj)
 objects.append(R1)
 objects.append(R2)
 
-##a = vertex( pos=vec(0,0,0) )
-##b = vertex( pos=vec(1,0,0) )
-##c = vertex( pos=vec(1,1,0) )
-##T = triangle( v0=a, v1=b, v2=c )
-
-# objects.append(T) we assunme only two objects
 
 def closest_vertices(obj1, obj2):
         '''
@@ -230,8 +236,6 @@ def closest_vertices(obj1, obj2):
                                 #print('closest_dst ', closest_dst)
                                 closest_dst = v_dst
                                 closest_pair = (v1,v2)
-        #print('closest_dst ', closest_dst)
-        #print('closest_pair ', closest_pair[0], closest_pair[1])
         return closest_pair
 
 def new_pair():
@@ -294,14 +298,7 @@ def grab(evt):
         print('evt ', evt.event)
         print('scene mouse pick ', scene.mouse.pick)
         print('scene mouse pos ', scene.mouse.pos)
-
-##        obj = scene.mouse.pick
-##        if (obj and
-##            obj.my_id != undefined and
-##            obj.my_id == obj1_id):
-##                pass # object created from triangles was chosen
-
-        
+      
         if scene.mouse.pick == R1.obj: # if mouseclick on R1, object = R1
                 for i in painted_vertices:
                         i.color = color.black
@@ -362,14 +359,15 @@ def moveR2(evt):
         
 def moveR3(evt):
         global drag_pos
-        # print('obj ', obj)
         # project onto xy plane, even if scene rotated:
         new_pos = evt.pos               # vector added
         
         if new_pos != drag_pos: # checks if mouse has moved
                 # offset for where the rectangle was touched:
                 displace = new_pos - drag_pos
-                R3.obj.pos += displace
+                R3.obj.pos += displace 
+                for i in R3.obj_vertices:
+                        i.pos += displace
                 drag_pos = new_pos # updates drag
                 
                 #update_closest_pts()
@@ -390,13 +388,19 @@ def setup_scene():
         
 print('start')
 
-os.listdir()
-
 setup_scene()
 
 
 
 
+# problem with storing vertices -- vertices should be updated automatically as pointers with its Object vertices but they seem to be copied to new Obj
+# if no better solution is found, we store vertices in as new Obj and it will create itself;
+# if this does not help either next possible solution is to move object and all its vertices on every mouse move e.g. Obj has def move(vector):
+# input object file should be specified as follows :
+# line should constist of two numbers - x,y - position
+# each line of file should correspond to one vertex position
+# in order to create convex object, minimum of 3 lines specified is required
+# each vertex in line must be connected to the previous one and the following one (except first and last)
 
 
 
