@@ -17,6 +17,9 @@ Implement user interaction with object
 User can move object (rotation is optional) <br>
 Show closest points (features) on both geometries <br>
 
+## State exams topic
+### https://drive.google.com/file/d/1VnM3IE4yIKGkk51aGQKZoY5UnIW1hVJV/view?usp=sharing
+
 ## Our progress so far
 ### https://www.youtube.com/watch?v=lmj4MT5yGOU
 
