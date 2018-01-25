@@ -4,6 +4,9 @@
 ## Topic of our project
 ### V-Clip: narrow phase collision detection
 #### Scene: Two 2D convex poly-line objects
+
+### Branch active: vpython file mng
+
 Implement object definition, 
 either read line segment positions from text file
 or implement user interface to create poly-line by clicking on canvas <br>
