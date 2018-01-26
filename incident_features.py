@@ -97,7 +97,8 @@ class Collision_detect():
 			#print ('vect ', vect.vect.x)
 			c = self.parametric(v.v1, v.vect)
 			#print ('check param')
-			#print ('v.v1 ', v.v1.pos.x, v.v1.pos.y)
+			print ('v.v1 ', v.v1.pos.x, v.v1.pos.y)
+			print ('v.v2 ', v.v2.pos.x, v.v2.pos.y)
 			print ('vect ', v.vect)
 			print ('c ', c)
 			for point in rx_neigh:
@@ -112,9 +113,9 @@ class Collision_detect():
 					#print('been there Y')
 					dst = v.v1.pos.y - point.pos.y
 				
-				#print ('dst ', dst)
+				print ('dst ', dst)
 				print ('with point ', point.pos.x, point.pos.y)
-				if abs(dst) <= 0.7:
+				if abs(dst) <= 0.2:
 					on_line = self.check_point_on_line(point, v)
 					if on_line:
 						#print ('online true ', dst)
@@ -163,7 +164,18 @@ class Collision_detect():
 		#print('up ', up)
 		down = math.sqrt(v.vect.x**2 + v.vect.y**2)
 		#print('down ', down)
-		return up/down
+		result = up/down
+		# alternative
+		up2 = abs(point.pos.x*(v.v2.pos.y - v.v1.pos.y) - point.pos.y*(v.v2.pos.x - v.v1.pos.x) + v.v2.pos.x*v.v1.pos.y - v.v2.pos.y*v.v1.pos.x)
+		down2 = math.sqrt((v.v2.pos.y - v.v1.pos.y)**2 + (v.v2.pos.x - v.v1.pos.x)**2)
+		result2 = up2/down2
+		# end
+		#if result == result2:
+		#	print ('up match TRUUUUEEEEE')
+		#else:
+		#	print (result)
+		#	print (result2)
+		return result2
 	
 	def move_point_along_pepren_vector(self, point, vect):
 		#print('origin point', point.pos.x, point.pos.y)
