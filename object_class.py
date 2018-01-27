@@ -149,22 +149,6 @@ class Obj:
 					self.lines[2].update(self.vertices[3],self.vertices[2])
 					self.lines[3].update(self.vertices[2],self.vertices[0])
 							
-        
-##                if not self.lines:
-##                        for i in range(0,self.vertices):
-##                                if i<len(self.vertices-1):
-##                                        line = self.Line(self.vertices[i].pos,self.vertices[i+1].pos)
-##                                else:
-##                                        line = self.Line(self.vertices[i].pos,self.vertices[0].pos)
-##                                self.lines.append(line)
-##                else:
-##                        for i in range(0, self.vertices):
-##                                if i<len(self.vertices):
-##                                        self.lines[i].update(self.vertices[i].pos,self.vertices[i+1].pos)
-##                                else
-##                                        self.lines[i].update(self.vertices[i].pos,self.vertices[0].pos)
-
-                
 	def nearest_vertices(self, obj2):
         # find couple of nearest vertexes between this obj and obj2
         # will run in 'move' function
@@ -186,10 +170,6 @@ class Obj:
 									closest.append(j)
 		return closest
 
-
-###
-# new code, only me
-###
 def vertex_dst(v1,v2):
 	x = abs(v1.pos.x - v2.pos.x)
 	y = abs(v1.pos.y - v2.pos.y)

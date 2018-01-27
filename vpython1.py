@@ -5,9 +5,10 @@ from object_class import Obj
 from loader import Loader
 import object_class
 import incident_features
+import paintjob
 print("STARTED")
-obj1_id = 'obj1'
-obj2_id = 'obj2'
+#obj1_id = 'obj1'
+#obj2_id = 'obj2'
 
 text_file_obj3 = 'Objects/object1.txt'
 text_file_obj2 = 'Objects/object2.txt'
@@ -21,14 +22,15 @@ R3.color = color.yellow
 
 objects = []    # store objects
 painted_vertices = [] # store painted points(verteces)
-
+painted_edge = None # only one edge at time can be in collision
+painted_edge2 = None # with exception of 2 colliding edges
 
 #create wrapper
 R2 = Obj(R2,vertices_multiline2)
 R3 = Obj(R3,vertices_multiline3)
 #R2.create_structure()
-print('r3 object vertices ', R3.vertices)
-print('r3 count of vertices ', len(R3.obj_vertices))
+#print('r3 object vertices ', R3.vertices)
+#print('r3 count of vertices ', len(R3.obj_vertices))
 
 # for nearest vertices computing with neighbours
 # GLOBALS
@@ -40,12 +42,14 @@ closest_dst = 10000000
 objects.append(R2)
 objects.append(R3)
 
+# count iterations
+iterations = 0
+
 
 def closest_vertices_crossroad(obj1, obj2):
 	#print('v1 ', v1_index)
 	#print('v2 ', v2_index)
 	if already_counted is False:
-		#print('that should be only ONCEEEEE')
 		return closest_vertices(obj1, obj2)
 	else:
 		return closest_vertices_neigh(obj1,obj2)
@@ -58,9 +62,10 @@ def closest_vertices(obj1, obj2):
         global v1_index
         global v2_index
         global already_counted
+        global iterations
         already_counted = True
         closest_dst = 10000000
-
+        iterations = 0
         #print('R3 len obj vertices ', len(obj2.obj_vertices))
         #print('R2 obj vertices ', obj1.obj_vertices)
         #print('R3 obj vertices ', obj2.obj_vertices)
@@ -68,18 +73,21 @@ def closest_vertices(obj1, obj2):
                 for v2 in obj2.obj_vertices:
                         v_dst = object_class.vertex_dst(v1, v2)		#new method from object_class file, outside main class
                         #print ('dst ', v_dst)
+                        iterations += 1
                         if v_dst <= closest_dst:
                                 #print('closest_dst ', closest_dst)
                                 closest_dst = v_dst
                                 closest_pair = (v1,v2)
                                 v1_index = obj1.obj_vertices.index(v1)
                                 v2_index = obj2.obj_vertices.index(v2)
-        return closest_pair
+        return (closest_pair, closest_dst)
 
 def closest_vertices_neigh(obj1,obj2):
 	global v1_index
 	global v2_index
 	global closest_dst
+	global iterations
+	iterations = 0
 	closest_dst = 10000000
 	list1 = [v1_index - 1, v1_index, (v1_index + 1) % len(obj1.obj_vertices)]
 	list2 = [v2_index - 1, v2_index, (v2_index + 1) % len(obj2.obj_vertices)]
@@ -89,27 +97,19 @@ def closest_vertices_neigh(obj1,obj2):
 			vertex2 = obj2.obj_vertices[v2]
 			v_dst = object_class.vertex_dst(vertex1, vertex2)
 			#print ('v dst ', v_dst, ' v1:', v1, ' v2:', v2) 
+			iterations += 1
 			if v_dst < closest_dst:
 				closest_dst = v_dst
 				closest_pair = (vertex1,vertex2)
 				v1_index = obj1.obj_vertices.index(vertex1)
 				v2_index = obj2.obj_vertices.index(vertex2)
-	if closest_dst < 0.15:
-		print('Collision Detection', closest_dst)
-	return closest_pair
+	if closest_dst < 0.12:
+		print('Vertices collision detected', closest_dst)
+	return (closest_pair, closest_dst)
 
 vertex_pair = closest_vertices_crossroad(R2, R3)
 print ('vertex pair at start ', vertex_pair)
 drag_pos = None # No object has been picked yet
-
-def paint_vertex_pair(closest_pts):
-        for i in range (0,len(closest_pts)):
-                if len(painted_vertices) <= i:
-                        painted_vertices.append(sphere(pos = vector(closest_pts[i].pos.x,closest_pts[i].pos.y,0),radius = 0.1, color = color.red))
-                else:
-                        #print(painted_vertices[i].pos)
-                        painted_vertices[i].pos = vector(closest_pts[i].pos.x,closest_pts[i].pos.y,0)
-                        painted_vertices[i].color = color.red
 
 def grab(evt):
         global drag_pos
@@ -134,10 +134,32 @@ def grab(evt):
 
 def update_closest_pts():
 	global closest_dst
-	closest_pts = closest_vertices_crossroad(R2, R3)
-	paint_vertex_pair(closest_pts)
+	global painted_edge
+	global painted_edge2
+	closest_pts, dst = closest_vertices_crossroad(R2, R3)
+	paintjob.paint_vertex_pair(painted_vertices, closest_pts, dst)
+	if dst <= 0.12:
+		#print('iterations to found vertex collision ', iterations)
+		return		# show collision only on vertices or edges, not both at time
 	collision = incident_features.Collision_detect(closest_pts, closest_dst, R2, R3)
-	collision.collision_possible()
+	vect = collision.collision_possible()
+	if vect is not None:
+		if type(vect) is tuple:
+			print('edge to edge collision')
+			painted_edge = paintjob.paint_edge(painted_edge, vect[0])
+			painted_edge2 = paintjob.paint_edge(painted_edge2, vect[1])
+			if painted_edge2 is not None:
+				painted_edge2.visible = False
+				del painted_edge2
+				painted_edge2 = None
+			return
+		painted_edge = paintjob.paint_edge(painted_edge, vect)
+		#print('iterations to found edge collision ', collision.iterations)
+		collision.iterations = 0
+	elif painted_edge is not None:
+		painted_edge.visible = False
+		del painted_edge
+		painted_edge = None
 
         
 def moveR2(evt):
@@ -154,7 +176,6 @@ def moveR2(evt):
                         i.pos += displace
                 drag_pos = new_pos # updates drag
                 update_closest_pts()
-        #print(R2.obj_vertices[0].pos.x)
         
 def moveR3(evt):
         global drag_pos
@@ -169,7 +190,6 @@ def moveR3(evt):
                         i.pos += displace
                 drag_pos = new_pos # updates drag
                 update_closest_pts()
-        #print(R3.obj_vertices[0].pos.x)
                 
 def drop(evt):
         #scene.unbind('mousemove', moveR1)
@@ -177,8 +197,6 @@ def drop(evt):
         scene.unbind('mousemove', moveR3)
         scene.unbind('mouseup', drop)
         # do something - label/light closest vertices somehow
-        
-        # vertex_pair = close   # error "variable referenced before assingment"
 
 def setup_scene():
         scene.title = 'Phase Collision Detection'
