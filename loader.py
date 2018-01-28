@@ -1,5 +1,10 @@
 from vpython import *
+import math
 class Loader:
+	
+	def __init__(self):
+		pass
+	
 	def load_object_vertices(file_name): 
 			file = open(file_name, 'r')
 			obj_vertices = []
@@ -25,3 +30,13 @@ class Loader:
 							e_idx-=1
 			new_obj = compound(tris)
 			return new_obj
+		
+	def points_in_circle(self, r, n = 100):
+		return [(math.cos(2*math.pi/n*x)*r,math.sin(2*math.pi/n*x)*r) for x in range(0,n+1)]
+	
+	def create_circle_file(self, size, number_of_points = 100):
+		points = self.points_in_circle(size, number_of_points)
+		f = open('Objects/circle.txt','w')
+		for point in points:
+			f.write(str(point[0]) + ' ' + str(point[1]) + '\n')
+		f.close()

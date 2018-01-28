@@ -4,7 +4,6 @@ import math
 
 class Obj:
 
-	# todo class Line
 	'''
 	class Line:
 			def __init__(self, start, end):
@@ -82,8 +81,6 @@ class Obj:
 	def __str__(self):
 			return 'wrapper class for vpython object ' + str(self.obj)
 
-	#def create_structure():
-		#self.
 	def get_neighbours(self, vertex):
 			try:
 				index = self.obj_vertices.index(vertex)

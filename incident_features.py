@@ -71,16 +71,13 @@ class Collision_detect():
 				dst = self.dst_point_vect(point, v, c)
 				
 				if v.vect.x == 0:
-					#print('been there X')
 					dst = v.v1.pos.x - point.pos.x
 					
 				if v.vect.y == 0:
-					#print('been there Y')
 					dst = v.v1.pos.y - point.pos.y
 				
-				#print ('dst ', dst)
 				#print ('with point ', point.pos.x, point.pos.y)
-				if abs(dst) <= 0.10:
+				if abs(dst) <= 0.07:
 					on_line = self.check_point_on_line(point, v)
 					if on_line:
 						print(' EDGE COLLISION DETECTED ', dst)
@@ -140,13 +137,9 @@ class Collision_detect():
 		return (None, None)
 	
 	def check_point_on_line(self, point, vect):
-		#print('vect x ', vect.v1.pos.x, vect.v2.pos.x)
-		#print( 'point x ', point.pos.x)
-		#print('vect y ', vect.v1.pos.y, vect.v2.pos.y)
-		#print( 'point y ', point.pos.y)
 		sorted_x = sorted([vect.v1.pos.x, vect.v2.pos.x])
 		sorted_y = sorted([vect.v1.pos.y, vect.v2.pos.y])
-		eps = 0.05
+		eps = 0.03
 		if (sorted_x[0] - eps <= point.pos.x <= sorted_x[1] + eps) and (sorted_y[0] -eps <= point.pos.y <= sorted_y[1] + eps):
 			return True
 		return False
@@ -175,19 +168,9 @@ class Collision_detect():
 		if painted_edge is False:
 			curve(vector(v.v1.pos.x,v.v1.pos.y,0), vector(v.v2.pos.x,v.v2.pos.y,0))
 			return True
-		#cyl = cylinder(pos=vector(v.vect.x, v.vect.y, 0), axis=vector(x,y,0), radius=0.05)
 	
 	def move_point_along_pepren_vector(self, point, vect):
-		#print('origin point', point.pos.x, point.pos.y)
-		#print('vect ', vect)
 		x = point.pos.x + vect.x
 		y = point.pos.y + vect.y
-		return [x,y]
-		
-	def detect_incident(self, vertex, edge):
-		pass
-		
-	def point_to_point(self, obj1, obj2):
-		pass
-	
+		return [x,y]	
 	

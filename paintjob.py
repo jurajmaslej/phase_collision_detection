@@ -22,5 +22,5 @@ def paint_edge(painted_edge, v):		# v is instance of Line class
 	#global painted_edge
 	if painted_edge is None:
 		painted_edge = curve(vector(v.v1.pos.x,v.v1.pos.y,0), vector(v.v2.pos.x,v.v2.pos.y,0), radius = 0.05)
-		painted_edge.color = color.red
+		painted_edge.color = color.cyan
 	return painted_edge
