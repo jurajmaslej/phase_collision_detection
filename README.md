@@ -29,7 +29,11 @@ Show closest points (features) on both geometries <br>
 ### Multi-line object added
 ### https://youtu.be/_x1wac8dQdQ
 
-### Code in progress is on branch 'vpython'
+### Code in progress on master
+### convex objects implemented
+### command line args for creating circle from polygons
+### VV, VE, EE collisions detected
+### Linear time complexity
 Implemented scene with 2 objects.  <br>
 Scene is scalable, user can rotate screen
 ### Objects
